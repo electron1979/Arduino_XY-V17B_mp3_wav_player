@@ -100,7 +100,7 @@ http://attach01.oss-us-west-1.aliyuncs.com/IC/Datasheet/13288.pdf
   uint8_t count         = 1;      // Count songs played once (before playing all)
   uint8_t indx          = 0;      // used to read Serial
   uint8_t noOfSongs     = 0;      // Number of tracks
-  uint8_t randomSeedPin = 0;      // random seed ANALOG INPUT
+  uint8_t randomSeedPin = 0;      // random seed ANALOG INPUT *Do not connect to anything*
   uint8_t playedAll     = 0;      // played all tracks flag
   uint8_t randTrack     = 0;      // random track to be played
   uint8_t busy          = 0;
