@@ -102,6 +102,7 @@ http://attach01.oss-us-west-1.aliyuncs.com/IC/Datasheet/13288.pdf
   uint8_t noOfSongs     = 0;      // Number of tracks
   uint8_t randomSeedPin = 0;      // random seed ANALOG INPUT *Do not connect to anything*
   uint8_t playedAll     = 0;      // played all tracks flag
+  uint8_t lastTrackAll  = 0;      // last track played in random group (== noOfSongs)
   uint8_t randTrack     = 0;      // random track to be played
   uint8_t busy          = 0;
   bool played[256]      = {LOW};  // keeps track of tracks played
@@ -172,7 +173,7 @@ void loop() {
 
   // Reset if played all. /////////////////////////////////////////////////////////////
     if (playedAll == HIGH)  {
-      Serial.println("\n\tPlayed all");
+      Serial.println("Played all\n\t");
       count = 1;
       for (uint8_t initial=0; initial<noOfSongs; initial++) {
 //      for (uint8_t initial=0; initial<sizeof(played); initial++) {
@@ -182,9 +183,10 @@ void loop() {
     
   // Pick random track (not already played) ///////////////////////////////////////////
     randTrack = random(1, noOfSongs+1);
-    while (played[randTrack-1]==HIGH)  {
+    while ( (played[randTrack-1]==HIGH) || (randTrack==lastTrackAll) ) {
       randTrack = random(1, noOfSongs+1);
     }
+    lastTrackAll = randTrack;
 
   // Play chosen track ////////////////////////////////////////////////////////////////
     Serial.print("Playing track[");
