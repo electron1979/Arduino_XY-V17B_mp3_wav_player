@@ -114,7 +114,7 @@ void setup() {
   
 
   pinMode(busyPin, INPUT);        // sets the "busy" pin as INPUT
-  pinMode(randomSeedPin, INPUT);  // sets the "busy" pin as INPUT
+  pinMode(randomSeedPin, INPUT);  // sets the "randomSeedPin" pin as INPUT
   randomSeed(analogRead(randomSeedPin));
   
   Serial.begin(115200);
