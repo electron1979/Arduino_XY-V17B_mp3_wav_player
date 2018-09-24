@@ -94,21 +94,25 @@ http://attach01.oss-us-west-1.aliyuncs.com/IC/Datasheet/13288.pdf
   byte folderNumberOfSongs[] = {0xAA, 0x12, 0x00, 0xBC};  // AA, 12 02, S.N.H S.N.L SM
 
 
-
-  uint8_t noSongs[6]    = {0};    // used to build Number of tracks (noOfSongs)
-  uint8_t busyPin       = 2;      // define "busy" pin
+  // globals
+  #define busyPin         2       // YOUR "busy" pin
+  #define randomSeedPin   0       // YOUR random seed ANALOG INPUT *Do not connect to anything*
+  
+  uint8_t noOfTracks    = 0;      // Number of tracks
   uint8_t count         = 1;      // Count songs played once (before playing all)
-  uint8_t indx          = 0;      // used to read Serial
-  uint8_t noOfSongs     = 0;      // Number of tracks
-  uint8_t randomSeedPin = 0;      // random seed ANALOG INPUT *Do not connect to anything*
   uint8_t playedAll     = 0;      // played all tracks flag
-  uint8_t lastTrackAll  = 0;      // last track played in random group (== noOfSongs)
+  uint8_t lastTrackAll  = 0;      // last track played in random group (== noOfTracks)
   uint8_t randTrack     = 0;      // random track to be played
   uint8_t busy          = 0;
   bool played[256]      = {LOW};  // keeps track of tracks played
 
+
   
 void setup() {
+  uint8_t noTracks[6]   = {0};    // used to build Number of tracks (noOfTracks)
+  uint8_t indx          = 0;      // used to read Serial noOfTracks
+  
+
   pinMode(busyPin, INPUT);        // sets the "busy" pin as INPUT
   pinMode(randomSeedPin, INPUT);  // sets the "busy" pin as INPUT
   randomSeed(analogRead(randomSeedPin));
@@ -126,15 +130,15 @@ void setup() {
   }
   Serial.println("");
   while (Serial1.available()) {
-    noSongs[indx] = Serial1.read();
-//    Serial.println(noSongs[indx++], HEX);
+    noTracks[indx] = Serial1.read();
+//    Serial.println(noTracks[indx++], HEX);
     indx++;
   }
   Serial.print("No. of songs: ");
-  noOfSongs = ( (256*noSongs[3]) + (noSongs[4]));
-  Serial.println(noOfSongs);
+  noOfTracks = ( (256*noTracks[3]) + (noTracks[4]));
+  Serial.println(noOfTracks);
 
-  for (uint8_t initial=0; initial<noOfSongs; initial++) {
+  for (uint8_t initial=0; initial<noOfTracks; initial++) {
     played[initial] = LOW;
   }
 
@@ -151,7 +155,7 @@ void setup() {
 }
 
 void loop() {
-  
+
   // Play random track (if not busy) //////////////////////////////////////////////////
   busy = (digitalRead(busyPin));
   if (busy == LOW) { // !busy
@@ -159,7 +163,7 @@ void loop() {
 
   // Check if played all tracks. //////////////////////////////////////////////////////
     playedAll = HIGH;
-    for (int8_t chck=0; chck<noOfSongs; chck++) {
+    for (int8_t chck=0; chck<noOfTracks; chck++) {
 //      Serial.print("played[");
 //      Serial.print(chck);
 //      Serial.print("]: ");
@@ -175,16 +179,16 @@ void loop() {
     if (playedAll == HIGH)  {
       Serial.println("Played all\n\t");
       count = 1;
-      for (uint8_t initial=0; initial<noOfSongs; initial++) {
+      for (uint8_t initial=0; initial<noOfTracks; initial++) {
 //      for (uint8_t initial=0; initial<sizeof(played); initial++) {
         played[initial] = LOW;
       }
     }
     
   // Pick random track (not already played) ///////////////////////////////////////////
-    randTrack = random(1, noOfSongs+1);
+    randTrack = random(1, noOfTracks+1);
     while ( (played[randTrack-1]==HIGH) || (randTrack==lastTrackAll) ) {
-      randTrack = random(1, noOfSongs+1);
+      randTrack = random(1, noOfTracks+1);
     }
     lastTrackAll = randTrack;
 
